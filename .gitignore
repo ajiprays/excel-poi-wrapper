@@ -1,0 +1,36 @@
+# Maven
+target/
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# NetBeans
+nbproject/private/
+build/
+nbbuild/
+dist/
+
+# Logs
+*.log
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Java
+*.class
+
+# Maven Wrapper (opsional)
+# Jika ingin menyimpan Maven Wrapper, JANGAN ignore file berikut
+# .mvn/
+# mvnw
+# mvnw.cmd
