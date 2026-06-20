@@ -45,7 +45,8 @@ public final class XlsRowIterator<T> implements Iterator<ImportResult<T>>, AutoC
 
 	private SSTRecord sst = null;
 	private boolean hasParsedHeaders = false;
-
+	private boolean hasValidatedHeaders = false;
+	
 	public XlsRowIterator(
 		RecordFactoryInputStream recordStream, 
 		String sheetName, XlsTableDefinition<T> tableDefinition
@@ -195,6 +196,7 @@ public final class XlsRowIterator<T> implements Iterator<ImportResult<T>>, AutoC
 		}
 		// Jika berada di bawah baris awal, arahkan ke penanganan Data Row
 		if (rowNum > this.startRowIndex && hasParsedHeaders) {
+			validateColumn();
 			return handleDataCell(rowNum, colNum, value);
 		}
 		return null;
@@ -206,6 +208,18 @@ public final class XlsRowIterator<T> implements Iterator<ImportResult<T>>, AutoC
 		hasParsedHeaders = true;
 	}
 
+	private void validateColumn() {
+		if (hasValidatedHeaders) {
+			return;
+		}
+		for (ColumnDefinition<T, ?> columnDefinition : columnDefinitions) {
+			if (!columnDefinition.isIgnoreNotFound() && !headers.containsValue(columnDefinition.getHeader())) {
+				throw new IllegalArgumentException("Column " + columnDefinition.getHeader() + " is not found.");
+			}
+		}
+		hasValidatedHeaders = true;
+	}
+	
 	// ================= METHOD MANAGEMENT DATA ROW =================
 	private ImportResult<T> handleDataCell(int rowNum, int colNum, String value) {
 		// Mendeteksi lompatan/transisi ke baris baru

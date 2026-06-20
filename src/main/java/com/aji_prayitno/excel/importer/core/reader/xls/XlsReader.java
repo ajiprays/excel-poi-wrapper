@@ -11,15 +11,18 @@ import org.apache.poi.hssf.record.RecordFactoryInputStream;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 
 import com.aji_prayitno.excel.importer.model.ImportResult;
+import com.aji_prayitno.excel.importer.model.SheetDefinition;
 import com.aji_prayitno.excel.importer.model.xls.XlsTableDefinition;
 
 public final class XlsReader {
 
 	private XlsReader() {}
 	
-	public static <T> Stream<ImportResult<T>> read(
-		InputStream inputStream, String sheetName, XlsTableDefinition<T> tableDefinition
-	) throws Exception {
+	public static <T> Stream<ImportResult<T>> read(SheetDefinition<T> sheetDefinition) {
+		InputStream inputStream = sheetDefinition.getInputStream();
+		String sheetName = sheetDefinition.getSheetName();
+		XlsTableDefinition<T> tableDefinition = sheetDefinition.getXlsTable();
+		
 		POIFSFileSystem fs = null;
 		InputStream workbookStream = null;
 		try {

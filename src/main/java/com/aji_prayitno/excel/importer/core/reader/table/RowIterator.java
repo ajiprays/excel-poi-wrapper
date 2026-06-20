@@ -261,10 +261,7 @@ Iterator<ImportResult<T>>, AutoCloseable {
         try {
             dtoInstance = dtoConstructor.newInstance();
         } catch (Exception e) {
-            throw new IllegalStateException(
-                    "Failed to create DTO instance.",
-                    e
-            );
+            throw new IllegalStateException("Failed to create DTO instance.", e);
         }
         Map<String, String> error = new HashMap<>();
         for (ColumnDefinition<T, ?> columnDefinition : columnDefinitions) {

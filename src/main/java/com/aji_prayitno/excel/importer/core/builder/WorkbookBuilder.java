@@ -29,11 +29,7 @@ public class WorkbookBuilder<T> implements WorkbookStep<T>, XlsWorkbookStep<T> {
 	public Stream<ImportResult<T>> importDataAsStream() {
 		if(Boolean.TRUE.equals(sheetDefinition.getIsXls())) {
 			try {
-				return XlsReader.read(
-					sheetDefinition.getInputStream(), 
-					sheetDefinition.getSheetName(), 
-					sheetDefinition.getXlsTable()
-				);
+				return XlsReader.read(sheetDefinition);
 			} catch (Exception e) {
 				throw new IllegalStateException("error reading xls file", e);
 			}

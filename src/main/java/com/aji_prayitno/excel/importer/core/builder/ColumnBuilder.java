@@ -17,10 +17,18 @@ public final class ColumnBuilder<T> implements ColumnStep<T>{
     public <V> ColumnStep<T> fromColumn(String header, DataSetter<T, V> setter) {
     	@SuppressWarnings("unchecked")
         Class<V> targetType = (Class<V>)ReflectionUtil.resolveParameterType(setter);
-        columns.add(new ColumnDefinition<>(header, setter, targetType));
+        columns.add(new ColumnDefinition<>(header, false, setter, targetType));
         return this;
     }
     
+	@Override
+	public <V> ColumnStep<T> fromColumnIgnoreNotFound(String header, DataSetter<T, V> setter) {
+    	@SuppressWarnings("unchecked")
+        Class<V> targetType = (Class<V>)ReflectionUtil.resolveParameterType(setter);
+        columns.add(new ColumnDefinition<>(header, true, setter, targetType));
+        return this;
+	}
+	
     public List<ColumnDefinition<T, ?>> build() {
         return columns;
     }

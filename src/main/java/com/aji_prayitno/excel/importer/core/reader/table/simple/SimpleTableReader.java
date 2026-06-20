@@ -87,50 +87,71 @@ public final class SimpleTableReader {
 		int firstRow = firstCell.getRow();
 		int lastRow = lastCell.getRow();
 
+		Map<String, Integer> columnIdx = resolveColumnIndex(tableDefinition, table);
+		return readData(tableDefinition, sheet, firstRow, lastRow, columnIdx);
+	}
+	
+	private static <T> Map<String, Integer> resolveColumnIndex(TableDefinition<T> tableDefinition, XSSFTable table) {
 		Map<String, Integer> columnIdx = new HashMap<>();
-		tableDefinition.getColumns().forEach(columnDefinition -> 
+		for(var columnDefinition : tableDefinition.getColumns()) {
+			var optColumn = getColumn(columnDefinition.getHeader(), table);
+			if(optColumn.isEmpty()) {
+				if(!columnDefinition.isIgnoreNotFound()) {
+					throw new IllegalArgumentException(
+						"Column " + columnDefinition.getHeader() + 
+						" is not found in table " + tableDefinition.getTableName() + "."
+					);
+				}
+				continue;
+			}
 			columnIdx.putIfAbsent(
 				columnDefinition.getHeader(), 
-				getColumn(columnDefinition.getHeader(), table).orElseThrow(() -> 
-					new IllegalArgumentException("Column " + columnDefinition.getHeader() + 
-						" was not found in table " + tableDefinition.getTableName() + "."
-					)
-				)
-				.getColumnIndex()
-			)
-		);
-		
-		List<ImportResult<T>> result = new ArrayList<>();
+				optColumn.orElseThrow().getColumnIndex()
+			);			
+		}
+		return columnIdx;
+	}
+
+	private static <T> List<ImportResult<T>> readData(TableDefinition<T> tableDefinition, XSSFSheet sheet, int firstRow,
+			int lastRow, Map<String, Integer> columnIdx) {
+		List<ImportResult<T>> results = new ArrayList<>();
 		int dataStartRow = firstRow + 1;
 		for (int rowIndex = dataStartRow; rowIndex <= lastRow; rowIndex++) {
 			Row row = sheet.getRow(rowIndex);
 			if (row == null) {
 				continue;
 			}
-	        T dtoInstance;
-	        try {
-	            dtoInstance = tableDefinition.getDtoClass().getDeclaredConstructor().newInstance();
-	        } catch (Exception e) {
-	            throw new IllegalStateException(
-	                    "Failed to create DTO instance.",
-	                    e
-	            );
-	        }
-			Map<String, String> error = new HashMap<>();
-			for(var columnDefinition : tableDefinition.getColumns()) {
-				Cell cell = row.getCell(columnIdx.get(columnDefinition.getHeader()));
-				try {
-					setColumnValue(dtoInstance, columnDefinition, cell);
-	            } catch (Exception e) {
-	            	String message = columnDefinition.getHeader() + ":" + e.getMessage();
-	                error.compute(columnDefinition.getHeader(), (k, v) -> v != null ? v + ", " + message : message);
-	            }
-			}
-			result.add(new ImportResult<>(dtoInstance, error));
+			results.add(readRowData(tableDefinition, columnIdx, row));
 		}
-		return result;
+		return results;
 	}
-
+	private static <T> ImportResult<T> readRowData(
+		TableDefinition<T> tableDefinition, 
+		Map<String, Integer> columnIdx, Row row
+	) {
+		T dtoInstance;
+		try {
+		    dtoInstance = tableDefinition.getDtoClass().getDeclaredConstructor().newInstance();
+		} catch (Exception e) {
+		    throw new IllegalStateException("Failed to create DTO instance.", e);
+		}
+		Map<String, String> error = new HashMap<>();
+		for(var columnDefinition : tableDefinition.getColumns()) {
+			var colIdx = columnIdx.get(columnDefinition.getHeader());
+			if(colIdx == null) {
+				continue;
+			}
+			Cell cell = row.getCell(colIdx);
+			try {
+				setColumnValue(dtoInstance, columnDefinition, cell);
+		    } catch (Exception e) {
+		    	String message = columnDefinition.getHeader() + ":" + e.getMessage();
+		        error.compute(columnDefinition.getHeader(), (k, v) -> v != null ? v + ", " + message : message);
+		    }
+		}
+		return new ImportResult<>(dtoInstance, error);
+	}
+	
 	private static <V, T> void setColumnValue(
         T instance,
         ColumnDefinition<T, V> columnDefinition,

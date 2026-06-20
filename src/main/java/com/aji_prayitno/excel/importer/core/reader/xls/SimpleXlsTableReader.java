@@ -68,15 +68,7 @@ public final class SimpleXlsTableReader {
 		}
 
 		Map<String, Integer> columnIndexes = resolveColumnIndexes(headerRow, tableDefinition);
-		List<ImportResult<T>> results = new ArrayList<>();
-		for (int rowIndex = headerRowIndex + 1; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
-			Row row = sheet.getRow(rowIndex);
-			if (row == null || isRowEmpty(row, columnIndexes)) {
-				continue;
-			}
-			results.add(readRow(row, rowIndex, tableDefinition, columnIndexes));
-		}
-		return results;
+		return readData(sheet, tableDefinition, headerRowIndex, columnIndexes);
 	}
 
 	private static <T> Map<String, Integer> resolveColumnIndexes(
@@ -94,29 +86,49 @@ public final class SimpleXlsTableReader {
 		for (ColumnDefinition<T, ?> columnDefinition : tableDefinition.getColumns()) {
 			Integer columnIndex = headerIndexes.get(columnDefinition.getHeader());
 			if (columnIndex == null) {
-				throw new IllegalArgumentException("Column: " + columnDefinition.getHeader()
-						+ " was not found in header row " + tableDefinition.getStartRowIndex() + ".");
+				if(!columnDefinition.isIgnoreNotFound()) {
+					throw new IllegalArgumentException("Column: " + columnDefinition.getHeader() + " is not found.");					
+				}
+				continue;
 			}
 			columnIndexes.put(columnDefinition.getHeader(), columnIndex);
 		}
 		return columnIndexes;
 	}
 
-	private static <T> ImportResult<T> readRow(
-		Row row, int rowIndex,
-		XlsTableDefinition<T> tableDefinition,
-		Map<String, Integer> columnIndexes
+	private static <T> List<ImportResult<T>> readData(
+		Sheet sheet, XlsTableDefinition<T> tableDefinition,
+		int headerRowIndex, Map<String, Integer> columnIndexes
+	) {
+		List<ImportResult<T>> results = new ArrayList<>();
+		for (int rowIndex = headerRowIndex + 1; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
+			Row row = sheet.getRow(rowIndex);
+			if (row == null || isRowEmpty(row, columnIndexes)) {
+				continue;
+			}
+			results.add(readRowData(tableDefinition, columnIndexes, row));
+		}
+		return results;
+	}
+
+	private static <T> ImportResult<T> readRowData(
+		XlsTableDefinition<T> tableDefinition, 
+		Map<String, Integer> columnIndexes, Row row
 	) {
 		T dtoInstance;
 		try {
 			dtoInstance = tableDefinition.getDtoClass().getDeclaredConstructor().newInstance();
 		} catch (Exception e) {
-			throw new IllegalStateException("Failed to create DTO instance for row " + (rowIndex + 1) + ".", e);
+			throw new IllegalStateException("Failed to create DTO instance for row .", e);
 		}
 
 		Map<String, String> errors = new HashMap<>();
 		for (ColumnDefinition<T, ?> columnDefinition : tableDefinition.getColumns()) {
-			Cell cell = row.getCell(columnIndexes.get(columnDefinition.getHeader()));
+			var colIdx = columnIndexes.get(columnDefinition.getHeader());
+			if(colIdx == null) {
+				continue;
+			}
+			Cell cell = row.getCell(colIdx);
 			try {
 				setColumnValue(dtoInstance, columnDefinition, cell);
 			} catch (Exception e) {

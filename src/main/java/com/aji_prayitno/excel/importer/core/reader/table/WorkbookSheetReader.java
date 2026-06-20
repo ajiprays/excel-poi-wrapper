@@ -71,6 +71,7 @@ public final class WorkbookSheetReader {
                 try (InputStream is = tablePart.getInputStream()) {
                     TableMetadata metadata = tableReader.read(sheetDefinition.getSheetName(), is);
                     if (targetTableName.equalsIgnoreCase(metadata.tableName())) {
+                    	validateColumn(sheetDefinition, targetTableName, metadata);
                         return metadata;
                     }
                 }
@@ -103,6 +104,20 @@ public final class WorkbookSheetReader {
                         + "'. Verify the file is .xlsx and the target range is formatted as an Excel Table."
         );
     }
+
+	private void validateColumn(SheetDefinition<?> sheetDefinition, String targetTableName, TableMetadata metadata) {
+		for(var columnDefinition : sheetDefinition.getTable().getColumns()) {
+			if(
+				!columnDefinition.isIgnoreNotFound() && 
+				!metadata.columns().contains(columnDefinition.getHeader())
+			) {
+				throw new IllegalArgumentException(
+					"Column " + columnDefinition.getHeader() + 
+					" is not found in table " + targetTableName + "."
+				);
+			}
+		}
+	}
 
     private PackagePart findSheetPart(XSSFReader.SheetIterator sheetIterator, String targetSheetName) {
         while (sheetIterator.hasNext()) {
