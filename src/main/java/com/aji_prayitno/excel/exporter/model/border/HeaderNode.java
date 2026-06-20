@@ -59,7 +59,7 @@ public final class HeaderNode {
 	}
 	@Override
 	public String toString() {
-		return "HeaderNode [label=" + label + ", children=" + children + ", parent=" + parent + ", startColumn="
+		return "HeaderNode [label=" + label + ", children=" + children + ", startColumn="
 				+ startColumn + ", depth=" + depth + ", colSpan=" + colSpan + ", rowSpan=" + rowSpan + "]";
 	}
 	
