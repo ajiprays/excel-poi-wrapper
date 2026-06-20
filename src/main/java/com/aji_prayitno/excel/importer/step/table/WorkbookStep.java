@@ -13,7 +13,7 @@ public interface WorkbookStep<T> {
 	 * <p>This method consumes the entire import stream and collects all
 	 * processed records into memory before returning.</p>
 	 *
-	 * <p>For large files, consider using {@link #importDataStreaming()}
+	 * <p>For large files, consider using {@link #importDataAsStream()}
 	 * to process records incrementally and reduce memory usage.</p>
 	 *
 	 * @return a list containing all imported records and their processing results

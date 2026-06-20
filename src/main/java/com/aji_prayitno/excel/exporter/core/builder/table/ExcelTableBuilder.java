@@ -44,24 +44,21 @@ public final class ExcelTableBuilder<T> implements ExcelTableStep<T> {
 	}
 
 	@Override
-	public SummaryStep addData(List<T> data) {
+	public void addData(List<T> data) {
 		tableDefinition.setDataType(DataType.LIST);
 		tableDefinition.setData(data);
-		return null;
 	}
 
 	@Override
-	public SummaryStep addData(Iterator<T> data) {
+	public void addData(Iterator<T> data) {
 		tableDefinition.setDataType(DataType.ITERATOR);
 		tableDefinition.setDataIterator(data);
-		return null;
 	}
 
 	@Override
-	public SummaryStep addData(Stream<T> data) {
+	public void addData(Stream<T> data) {
 		tableDefinition.setDataType(DataType.STREAM);
 		tableDefinition.setDataStream(data);
-		return null;
 	}
 	
 	public ExcelTableDefinition<T> build() {
