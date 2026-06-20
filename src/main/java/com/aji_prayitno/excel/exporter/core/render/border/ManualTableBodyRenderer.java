@@ -48,6 +48,7 @@ public final class ManualTableBodyRenderer {
 		int columnSize = columns.size();
 		int dataSize = tableDefinition.getData().size();
 		for (int dataIdx = 0; dataIdx < dataSize; dataIdx++) {
+			logger.debug("render body row:{} data index {}", lastRowIndex, dataIdx);
 			T item = tableDefinition.getData().get(dataIdx);
 			Row row = CellUtil.getRow(lastRowIndex, sheet);
 			for (int columnIdx = 0; columnIdx < columnSize; columnIdx++) {
@@ -82,6 +83,7 @@ public final class ManualTableBodyRenderer {
 		int columnSize = columns.size();
 		int dataIdx = 0;
 		while(data.hasNext()) {
+			logger.debug("render body from iterator row:{}", lastRowIndex);
 			T item = data.next();
 			Row row = CellUtil.getRow(lastRowIndex, sheet);
 			for (int columnIdx = 0; columnIdx < columnSize; columnIdx++) {
@@ -173,11 +175,12 @@ public final class ManualTableBodyRenderer {
 		for (int i = 0; i < columns.size(); i++) {
 			ManualTableColumnDefinition<T> column = columns.get(i);
 			if (column.getWidth() != null) {
-				sheet.setColumnWidth(i, column.getWidth() * 256);
+				int columnLength = column.getHeader().getPaths().get(column.getHeader().getPaths().size()-1).length();
+				sheet.setColumnWidth(i, (columnLength > column.getWidth() ? columnLength : column.getWidth()) * 256);
 				continue;
 			}
 			if (column.isAutoSize()) {
-				sheet.autoSizeColumn(i);
+				sheet.autoSizeColumn(i, true);
 			}
 		}
 	}

@@ -11,12 +11,13 @@ import com.aji_prayitno.excel.exporter.model.border.HeaderCell;
 import com.aji_prayitno.excel.exporter.model.border.HeaderNode;
 
 public final class HeaderTreeBuilder {
-	private final Logger logger = LoggerFactory.getLogger(HeaderTreeBuilder.class);
+	private static final Logger logger = LoggerFactory.getLogger(HeaderTreeBuilder.class);
 	
 	private HeaderTreeBuilder() {
 	}
 
 	public static <T> HeaderNode build(List<ManualTableColumnDefinition<T>> columns) {
+		logger.debug("build header node");
 		HeaderNode root = new HeaderNode("__ROOT__");
 		for (ManualTableColumnDefinition<?> column : columns) {
 			HeaderCell header = column.getHeader();
@@ -28,6 +29,7 @@ public final class HeaderTreeBuilder {
 		int maxDepth = findMaxDepth(root);
 		calculateRowSpan(root, maxDepth);
 		assignStartColumn(root, 0);
+		logger.debug("header node {}", root.toString());
 		return root;
 	}
 

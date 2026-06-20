@@ -34,8 +34,8 @@ public final class SheetRenderer {
 			ManualTableDefinition<?> tableDefinition = sheetDefinition.getManualTable();
 			boolean autoSizeFound = tableDefinition.getColumns().stream()
 					.anyMatch(column -> column.isAutoSize() && column.getWidth() == null);
-			if (autoSizeFound && sheet instanceof SXSSFSheet) {
-				((SXSSFSheet)sheet).trackAllColumnsForAutoSizing();
+			if (autoSizeFound && sheet instanceof SXSSFSheet sxssfSheet) {
+				sxssfSheet.trackAllColumnsForAutoSizing();
 			}
 			currentRowIndex = rendererFactory.manualTableHeaderRenderer().render(context, tableDefinition, currentRowIndex);	
 			currentRowIndex = rendererFactory.manualTableBodyRenderer().render(context, tableDefinition, currentRowIndex);
@@ -45,8 +45,8 @@ public final class SheetRenderer {
 			ExcelTableDefinition<?> excelTableDefinition = sheetDefinition.getExcelTable(); 
 			boolean autoSizeFound = excelTableDefinition.getColumns().stream()
 					.anyMatch(column -> column.isAutoSize() && column.getWidth() == null);
-			if (autoSizeFound && sheet instanceof SXSSFSheet) {
-				((SXSSFSheet)sheet).trackAllColumnsForAutoSizing();
+			if (autoSizeFound && sheet instanceof SXSSFSheet sxssfSheet) {
+				sxssfSheet.trackAllColumnsForAutoSizing();
 			}
 			currentRowIndex = rendererFactory.excelTableHeaderRenderer().render(context, excelTableDefinition, currentRowIndex);
 			currentRowIndex = rendererFactory.excelTableBodyRenderer().render(context, excelTableDefinition, currentRowIndex);

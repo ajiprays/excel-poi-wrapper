@@ -2,7 +2,6 @@ package com.aji_prayitno.excel.exporter.core.render.border;
 
 import java.util.List;
 
-import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
@@ -34,6 +33,7 @@ public final class ManualTableSummaryRenderer {
 		Row row = CellUtil.getRow(lastRowIndex, context.getSheet());
 		int cellIndex = 0;
 		for (ManualTableSummaryDefinition summary : manualTableDefinition.getSummaries()) {
+			logger.debug("render sumarry row:{}", lastRowIndex);
 			List<?> columns = manualTableDefinition.getColumns();
 			for (int columnIdx = 0; columnIdx < columns.size(); columnIdx++) {
 				if(columnIdx == 0) {

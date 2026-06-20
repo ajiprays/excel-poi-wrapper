@@ -13,7 +13,6 @@ import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableColumns;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTTableStyleInfo;
 
 import com.aji_prayitno.excel.exporter.core.render.RenderContext;
-import com.aji_prayitno.excel.exporter.model.SheetDefinition;
 import com.aji_prayitno.excel.exporter.model.table.ExcelTableColumnDefinition;
 import com.aji_prayitno.excel.exporter.model.table.ExcelTableDefinition;
 
@@ -26,8 +25,8 @@ public class ExcelTableRenderer {
 	) {
 		XSSFSheet xssfSheet = null;
 		Sheet sheet = context.getSheet();
-		if (context.getWorkbook() instanceof SXSSFWorkbook) {
-			xssfSheet = ((SXSSFWorkbook) context.getWorkbook()).getXSSFWorkbook()
+		if (context.getWorkbook() instanceof SXSSFWorkbook sxssfWorkbook) {
+			xssfSheet = sxssfWorkbook.getXSSFWorkbook()
 					.getSheet(sheet.getSheetName());
 		} else {
 			xssfSheet = (XSSFSheet) sheet;
@@ -37,7 +36,6 @@ public class ExcelTableRenderer {
 		AreaReference area = new AreaReference(new CellReference(startRowIndex, 0),
 				new CellReference(lastRow, lastColumn), SpreadsheetVersion.EXCEL2007);
 		XSSFTable table = xssfSheet.createTable(area);
-		table.getCTTable().setId(1);
 		table.setName(excelTableDefinition.getName());
 		table.setDisplayName(excelTableDefinition.getName());
 		applyColumns(table, excelTableDefinition);
@@ -61,7 +59,7 @@ public class ExcelTableRenderer {
 		}
 	}
 
-	private <T> void applyStyle(XSSFTable table) {
+	private void applyStyle(XSSFTable table) {
 		CTTableStyleInfo style = table.getCTTable().addNewTableStyleInfo();
 		if (style == null) {
 			style = table.getCTTable().addNewTableStyleInfo();

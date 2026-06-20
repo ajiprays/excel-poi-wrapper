@@ -28,7 +28,7 @@ public final class ExcelTableHeaderRenderer {
 		Sheet sheet = context.getSheet();
 		int startCol = 0;
 		for (ExcelTableColumnDefinition<T> columnDefinition : tableDefinition.getColumns()) {
-			logger.debug("render header row:{} columne:{}", lastRowIndex, columnDefinition.getHeader());
+			logger.debug("render header row:{} column:{}", lastRowIndex, columnDefinition.getHeader());
 			Row row = CellUtil.getRow(lastRowIndex, sheet);
 			Cell cell = CellUtil.getCell(row, startCol);
 			cell.setCellValue(columnDefinition.getHeader());

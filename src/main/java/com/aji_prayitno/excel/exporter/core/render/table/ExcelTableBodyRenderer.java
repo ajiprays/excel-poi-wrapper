@@ -46,6 +46,7 @@ public final class ExcelTableBodyRenderer {
 		int columnSize = columns.size();
 		int dataSize = tableDefinition.getData().size();
 		for (int dataIdx = 0; dataIdx < dataSize; dataIdx++) {
+			logger.debug("render body row:{} data index {}", lastRowIndex, dataIdx);
 			T item = tableDefinition.getData().get(dataIdx);
 			Row row = CellUtil.getRow(lastRowIndex, sheet);
 			for (int columnIdx = 0; columnIdx < columnSize; columnIdx++) {
@@ -69,6 +70,7 @@ public final class ExcelTableBodyRenderer {
 		List<ExcelTableColumnDefinition<T>> columns = tableDefinition.getColumns();
 		int columnSize = columns.size();
 		while(data.hasNext()) {
+			logger.debug("render body row:{}", lastRowIndex);
 			T item = data.next();
 			Row row = CellUtil.getRow(lastRowIndex, sheet);
 			for (int columnIdx = 0; columnIdx < columnSize; columnIdx++) {

@@ -57,4 +57,10 @@ public final class HeaderNode {
 	public void setRowSpan(int rowSpan) {
 		this.rowSpan = rowSpan;
 	}
+	@Override
+	public String toString() {
+		return "HeaderNode [label=" + label + ", children=" + children + ", parent=" + parent + ", startColumn="
+				+ startColumn + ", depth=" + depth + ", colSpan=" + colSpan + ", rowSpan=" + rowSpan + "]";
+	}
+	
 }

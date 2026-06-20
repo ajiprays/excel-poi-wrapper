@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import com.aji_prayitno.excel.exporter.core.builder.border.HeaderTreeBuilder;
 import com.aji_prayitno.excel.exporter.core.render.RenderContext;
 import com.aji_prayitno.excel.exporter.core.render.Util;
-import com.aji_prayitno.excel.exporter.model.SheetDefinition;
 import com.aji_prayitno.excel.exporter.model.border.HeaderNode;
 import com.aji_prayitno.excel.exporter.model.border.ManualTableDefinition;
 import com.aji_prayitno.excel.exporter.style.StyleKey.BorderStyleType;
@@ -29,7 +28,7 @@ public final class ManualTableHeaderRenderer {
 		this.styles = styles;
 	}
 
-	public <T> int render(RenderContext context, ManualTableDefinition<?> tableDefinition, int lastRowIndex) {
+	public int render(RenderContext context, ManualTableDefinition<?> tableDefinition, int lastRowIndex) {
 		logger.debug("render sheet {} header", context.getSheet().getSheetName());
 		Sheet sheet = context.getSheet();
 		int totalColumn = tableDefinition.getColumns().size();
