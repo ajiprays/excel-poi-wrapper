@@ -44,6 +44,10 @@ dependencies {
 }
 ```
 
+### Catatan Runtime
+
+Library ini menggunakan `slf4j-api` untuk logging. Aplikasi consumer perlu menambahkan salah satu SLF4J provider di runtime, misalnya `slf4j-simple` atau `logback-classic`, agar warning `No SLF4J providers were found` tidak muncul.
+
 ### Untuk Maintainer
 
 ```bash
