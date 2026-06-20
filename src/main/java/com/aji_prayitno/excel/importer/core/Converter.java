@@ -16,6 +16,8 @@ import java.util.UUID;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DateUtil;
 
 public final class Converter {
@@ -105,4 +107,21 @@ public final class Converter {
         if (type == char.class) return '\0';
         return null;
     }
+    
+    public static String readCellValue(Cell cell) {
+		if (cell == null) {
+			return null;
+		}
+		CellType cellType = cell.getCellType() == CellType.FORMULA
+				? cell.getCachedFormulaResultType()
+				: cell.getCellType();
+		return switch (cellType) {
+			case BLANK -> null;
+			case NUMERIC -> String.valueOf(cell.getNumericCellValue());
+			case BOOLEAN -> String.valueOf(cell.getBooleanCellValue());
+			case STRING -> cell.getStringCellValue();
+			case ERROR -> "";
+			default -> cell.toString();
+		};
+	}
 }

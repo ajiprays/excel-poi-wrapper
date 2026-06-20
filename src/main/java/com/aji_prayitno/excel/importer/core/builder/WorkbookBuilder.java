@@ -5,6 +5,7 @@ import java.util.stream.Stream;
 
 import com.aji_prayitno.excel.importer.core.reader.table.WorkbookSheetReader;
 import com.aji_prayitno.excel.importer.core.reader.table.simple.SimpleTableReader;
+import com.aji_prayitno.excel.importer.core.reader.xls.SimpleXlsTableReader;
 import com.aji_prayitno.excel.importer.core.reader.xls.XlsReader;
 import com.aji_prayitno.excel.importer.model.ImportResult;
 import com.aji_prayitno.excel.importer.model.SheetDefinition;
@@ -43,6 +44,9 @@ public class WorkbookBuilder<T> implements WorkbookStep<T>, XlsWorkbookStep<T> {
 	
 	@Override
 	public List<ImportResult<T>> importDataSmallFile() {
+		if(Boolean.TRUE.equals(sheetDefinition.getIsXls())) {
+			return SimpleXlsTableReader.read(sheetDefinition);
+		}
 		return SimpleTableReader.read(sheetDefinition);
 	}
 }

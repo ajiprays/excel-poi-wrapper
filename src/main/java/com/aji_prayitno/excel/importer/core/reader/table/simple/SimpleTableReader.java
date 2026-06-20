@@ -136,27 +136,11 @@ public final class SimpleTableReader {
         ColumnDefinition<T, V> columnDefinition,
         Cell cell
     ) {
-		if (cell == null) {
-			V convertedValue = Converter.convert(null, columnDefinition.getTargetType());
-			columnDefinition.getSetter().accept(instance, convertedValue);
-			return;
-		}
-        V convertedValue = Converter.convert(
-    		switch (cell.getCellType()) {
-    		case BLANK: {
-    			yield null;
-    		}
-			case NUMERIC: {
-				yield String.valueOf(cell.getNumericCellValue());
-			}
-			case BOOLEAN: {
-				yield String.valueOf(cell.getBooleanCellValue());
-			}
-			default:
-				yield cell.getStringCellValue();
-			}, 
-			columnDefinition.getTargetType()
+        columnDefinition.getSetter().accept(
+    		instance, 
+    		Converter.convert(
+				Converter.readCellValue(cell), columnDefinition.getTargetType()
+			)
 		);
-        columnDefinition.getSetter().accept(instance, convertedValue);
     }
 }
