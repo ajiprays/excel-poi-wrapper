@@ -1,20 +1,24 @@
 package com.aji_prayitno.excel.importer.model;
 
+import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.poi.poifs.filesystem.FileMagic;
+
+import com.aji_prayitno.excel.importer.model.plain.PlainTableDefinition;
 import com.aji_prayitno.excel.importer.model.table.TableDefinition;
-import com.aji_prayitno.excel.importer.model.xls.XlsTableDefinition;
 
 public final class SheetDefinition<T> {
 
 	private InputStream inputStream;
     private String sheetName;
     private Boolean isXls;
+    private Boolean isPlain;
     private TableDefinition<T> table = new TableDefinition<>();
-    private XlsTableDefinition<T> xlsTable = new XlsTableDefinition<>();
+    private PlainTableDefinition<T> plainTable = new PlainTableDefinition<>();
 
     public SheetDefinition(InputStream inputStream) {
-		this.inputStream = inputStream;
+		this.inputStream = FileMagic.prepareToCheckMagic(inputStream);
 	}
 	public InputStream getInputStream() {
 		return inputStream;
@@ -26,21 +30,39 @@ public final class SheetDefinition<T> {
         return sheetName;
     }
     public Boolean getIsXls() {
+    	if(isXls == null) {
+    		FileMagic magic;
+			try {
+				magic = FileMagic.valueOf(inputStream);
+			} catch (IOException e) {
+	            throw new IllegalStateException("Failed to read file import due to an I/O error.", e);
+			}
+    		if (magic == FileMagic.OOXML) {
+    			isXls = false;                
+            } else if (magic == FileMagic.OLE2) {
+            	isXls = true;
+            } else {
+                throw new IllegalArgumentException("invalid file.");
+            }
+    	}
 		return isXls;
+	}
+	public Boolean getIsPlain() {
+		return isPlain;
 	}
 	public TableDefinition<T> getTable() {
         return table;
     }
     public void addTable(TableDefinition<T> table) {
-    	this.isXls = false;
+    	this.isPlain = false;
         this.table = table;
     }
-	public XlsTableDefinition<T> getXlsTable() {
-		return xlsTable;
+	public PlainTableDefinition<T> getPlainTable() {
+		return plainTable;
 	}
-	public void addXlsTable(XlsTableDefinition<T> xlsTable) {
-		this.isXls = true;
-		this.xlsTable = xlsTable;
+	public void addPlainTable(PlainTableDefinition<T> plainTable) {
+		this.isPlain = true;
+		this.plainTable = plainTable;
 	}
     
 }

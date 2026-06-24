@@ -7,8 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.aji_prayitno.excel.exporter.model.SheetDefinition;
-import com.aji_prayitno.excel.exporter.model.border.ManualTableDefinition;
-import com.aji_prayitno.excel.exporter.model.table.ExcelTableDefinition;
 
 
 public final class SheetRenderer {
@@ -23,34 +21,35 @@ public final class SheetRenderer {
 	}
 
 	public void render(SheetDefinition sheetDefinition) {
+		logger.debug("render sheet:{}", sheetDefinition.getSheetName());
 		RenderContext context = new RenderContext(workbook, workbook.createSheet(sheetDefinition.getSheetName()));
 		Sheet sheet = context.getSheet();
 		
 		int currentRowIndex = 0;
-		currentRowIndex = rendererFactory.titleRenderer().render(context, sheetDefinition, currentRowIndex);
+		currentRowIndex = rendererFactory.titleRenderer()
+				.render(context, sheetDefinition, currentRowIndex);
 		int startRowIndex = currentRowIndex + 1;
+		trackAutoSizeColumn(sheet, sheetDefinition);
+		currentRowIndex = rendererFactory.headerRenderer(sheetDefinition.getIsManualTable())
+				.render(context, sheetDefinition, currentRowIndex);	
+		currentRowIndex = rendererFactory.bodyRenderer(sheetDefinition.getIsManualTable())
+				.render(context, sheetDefinition, currentRowIndex);
+		
 		if(Boolean.TRUE.equals(sheetDefinition.getIsManualTable())) {
-			logger.debug("render sheet:{} manualtable", sheetDefinition.getSheetName());
-			ManualTableDefinition<?> tableDefinition = sheetDefinition.getManualTable();
-			boolean autoSizeFound = tableDefinition.getColumns().stream()
-					.anyMatch(column -> column.isAutoSize() && column.getWidth() == null);
-			if (autoSizeFound && sheet instanceof SXSSFSheet sxssfSheet) {
-				sxssfSheet.trackAllColumnsForAutoSizing();
-			}
-			currentRowIndex = rendererFactory.manualTableHeaderRenderer().render(context, tableDefinition, currentRowIndex);	
-			currentRowIndex = rendererFactory.manualTableBodyRenderer().render(context, tableDefinition, currentRowIndex);
-			rendererFactory.summaryRenderer().render(context, tableDefinition, currentRowIndex);
+			rendererFactory.summaryRenderer().render(
+				context, sheetDefinition.getManualTable(), currentRowIndex
+			);
 		}else {
-			logger.debug("render sheet:{} exceltable", sheetDefinition.getSheetName());
-			ExcelTableDefinition<?> excelTableDefinition = sheetDefinition.getExcelTable(); 
-			boolean autoSizeFound = excelTableDefinition.getColumns().stream()
-					.anyMatch(column -> column.isAutoSize() && column.getWidth() == null);
-			if (autoSizeFound && sheet instanceof SXSSFSheet sxssfSheet) {
-				sxssfSheet.trackAllColumnsForAutoSizing();
-			}
-			currentRowIndex = rendererFactory.excelTableHeaderRenderer().render(context, excelTableDefinition, currentRowIndex);
-			currentRowIndex = rendererFactory.excelTableBodyRenderer().render(context, excelTableDefinition, currentRowIndex);
-			rendererFactory.excelTableRenderer().render(context, excelTableDefinition, startRowIndex-1, currentRowIndex-1);
+			rendererFactory.excelTableRenderer().render(
+				context, sheetDefinition.getExcelTable(), 
+				startRowIndex-1, currentRowIndex-1
+			);
+		}
+	}
+
+	private void trackAutoSizeColumn(Sheet sheet, SheetDefinition sheetDefinition) {
+		if (sheetDefinition.isAutoSizeFound() && sheet instanceof SXSSFSheet sxssfSheet) {
+			sxssfSheet.trackAllColumnsForAutoSizing();
 		}
 	}
 }

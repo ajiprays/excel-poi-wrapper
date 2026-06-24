@@ -12,23 +12,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.aji_prayitno.excel.exporter.core.builder.border.HeaderTreeBuilder;
+import com.aji_prayitno.excel.exporter.core.render.HeaderRenderer;
 import com.aji_prayitno.excel.exporter.core.render.RenderContext;
 import com.aji_prayitno.excel.exporter.core.render.Util;
+import com.aji_prayitno.excel.exporter.model.SheetDefinition;
 import com.aji_prayitno.excel.exporter.model.border.HeaderNode;
 import com.aji_prayitno.excel.exporter.model.border.ManualTableDefinition;
 import com.aji_prayitno.excel.exporter.style.StyleKey.BorderStyleType;
 import com.aji_prayitno.excel.exporter.style.StyleRegistry;
 
-public final class ManualTableHeaderRenderer {
+public final class ManualTableHeaderRenderer implements HeaderRenderer {
 	
 	private final Logger logger = LoggerFactory.getLogger(ManualTableHeaderRenderer.class);
 	private final StyleRegistry styles;
 
+	
 	public ManualTableHeaderRenderer(StyleRegistry styles) {
 		this.styles = styles;
 	}
 
-	public int render(RenderContext context, ManualTableDefinition<?> tableDefinition, int lastRowIndex) {
+	@Override
+	public int render(RenderContext context, SheetDefinition sheetDefinition, int lastRowIndex) {
+		return render(context, sheetDefinition.getManualTable(), lastRowIndex);
+	}
+	
+	private int render(RenderContext context, ManualTableDefinition<?> tableDefinition, int lastRowIndex) {
 		logger.debug("render sheet {} header", context.getSheet().getSheetName());
 		Sheet sheet = context.getSheet();
 		int totalColumn = tableDefinition.getColumns().size();

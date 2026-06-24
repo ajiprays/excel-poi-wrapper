@@ -59,4 +59,12 @@ public class SheetDefinition {
 	public void setExcelTable(ExcelTableDefinition<?> excelTable) {
 		this.excelTable = excelTable;
 	}
+	public boolean isAutoSizeFound() {
+		if(Boolean.TRUE.equals(isManualTable)) {
+			return manualTable.getColumns().stream()
+					.anyMatch(column -> column.isAutoSize() && column.getWidth() == null);
+		}
+		return excelTable.getColumns().stream()
+				.anyMatch(column -> column.isAutoSize() && column.getWidth() == null);
+	}
 }

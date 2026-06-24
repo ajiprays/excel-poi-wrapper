@@ -1,4 +1,5 @@
-package com.aji_prayitno.excel.importer.core.reader.table;
+
+package com.aji_prayitno.excel.importer.core.reader.xlsx.table;
 
 import java.io.IOException;
 import java.io.InputStream;

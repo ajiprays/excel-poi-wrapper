@@ -1,4 +1,4 @@
-package com.aji_prayitno.excel.importer.core.reader.table;
+package com.aji_prayitno.excel.importer.core.reader.xlsx.table;
 
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -13,9 +13,9 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.apache.poi.xssf.model.SharedStringsTable;
+import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
 
-import com.aji_prayitno.excel.importer.core.Converter;
+import com.aji_prayitno.excel.importer.core.reader.Util;
 import com.aji_prayitno.excel.importer.model.ColumnDefinition;
 import com.aji_prayitno.excel.importer.model.ImportResult;
 import com.aji_prayitno.excel.importer.model.metadata.TableMetadata;
@@ -26,7 +26,7 @@ Iterator<ImportResult<T>>, AutoCloseable {
 
     private final InputStream sheetStream;
     private final XMLStreamReader xmlReader;
-    private final SharedStringsTable sharedStrings;
+    private final ReadOnlySharedStringsTable sharedStrings;
     private final TableMetadata metadata;
 
     private final Constructor<T> dtoConstructor;
@@ -54,7 +54,7 @@ Iterator<ImportResult<T>>, AutoCloseable {
     
     public RowIterator(
         InputStream sheetStream,
-        SharedStringsTable sharedStrings,
+        ReadOnlySharedStringsTable sharedStrings,
         TableMetadata metadata,
         TableDefinition<T> tableDefinition
     ) {
@@ -202,7 +202,7 @@ Iterator<ImportResult<T>>, AutoCloseable {
                 throw new IllegalStateException("Cell inside row " + toExcelRowNumber(currentRowNumber)
                         + " is missing required reference attribute 'r'.");
             }
-            currentColumn = convertRefToCol(ref);
+            currentColumn = Util.convertRefToCol(ref);
         }
     }
     
@@ -226,18 +226,6 @@ Iterator<ImportResult<T>>, AutoCloseable {
             return addCurrentRow(currentRowValues);
         }
         return null;
-    }
-    
-    private int convertRefToCol(String ref) {
-        int col = 0;
-        for (int i = 0; i < ref.length(); i++) {
-            char c = ref.charAt(i);
-            if (Character.isDigit(c)) {
-                break;
-            }
-            col = col * 26 + (c - 'A' + 1);
-        }
-        return col - 1;
     }
     
     private String resolveCellValue() {
@@ -266,23 +254,13 @@ Iterator<ImportResult<T>>, AutoCloseable {
         Map<String, String> error = new HashMap<>();
         for (ColumnDefinition<T, ?> columnDefinition : columnDefinitions) {
             try {
-                setColumnValue(dtoInstance, columnDefinition, currentRowValues);
+                Util.setColumnValue(dtoInstance, columnDefinition, currentRowValues);
             } catch (Exception e) {
-                String message = columnDefinition.getHeader() + ":" + e.getMessage();
-                error.compute(columnDefinition.getHeader(), (k, v) -> v != null ? v + ", " + message : message);
+                String message = columnDefinition.header() + ":" + e.getMessage();
+                error.compute(columnDefinition.header(), (k, v) -> v != null ? v + ", " + message : message);
             }
         }
         return new ImportResult<>(dtoInstance, error);
-    }
-
-    private <V> void setColumnValue(
-        T instance,
-        ColumnDefinition<T, V> columnDefinition,
-        Map<String, String> currentRowValues
-    ) {
-        String rawValue = currentRowValues.get(columnDefinition.getHeader());
-        V convertedValue = Converter.convert(rawValue, columnDefinition.getTargetType());
-        columnDefinition.getSetter().accept(instance, convertedValue);
     }
 
     private int toExcelRowNumber(int zeroBasedRow) {

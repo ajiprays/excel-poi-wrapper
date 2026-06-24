@@ -1,9 +1,6 @@
 package com.aji_prayitno.excel.exporter.step;
 
-import java.io.OutputStream;
-
-
-public interface BuildStep {
+public interface BuildStep extends WorkbookStep{
 	
 	/**
 	 * Enables or disables streaming workbook generation.
@@ -21,18 +18,4 @@ public interface BuildStep {
 	 */
 	BuildStep rowAccessWindowSize(int rowAccessWindowSize);
 
-	/**
-	 * Builds the workbook and returns its binary Excel content.
-	 *
-	 * @return generated workbook bytes
-	 */
-	byte[] build();
-
-	/**
-	 * Builds the workbook and writes it to the provided output stream.
-	 *
-	 * @param out destination stream for the generated workbook
-	 */
-	void build(OutputStream out);
-	
 }

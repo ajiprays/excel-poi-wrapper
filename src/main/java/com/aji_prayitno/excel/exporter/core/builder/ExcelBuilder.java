@@ -3,6 +3,7 @@ package com.aji_prayitno.excel.exporter.core.builder;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +18,7 @@ import com.aji_prayitno.excel.exporter.step.BuildStep;
 import com.aji_prayitno.excel.exporter.step.SheetStep.SheetStepConfigurer;
 import com.aji_prayitno.excel.exporter.step.WorkbookStep;
 
-public class ExcelBuilder implements WorkbookStep, BuildStep {
+public class ExcelBuilder implements BuildStep {
 	private final Logger logger = LoggerFactory.getLogger(ExcelBuilder.class);
 	
 	private boolean streaming;
@@ -49,28 +50,23 @@ public class ExcelBuilder implements WorkbookStep, BuildStep {
 	
 	@Override
 	public byte[] build() {
-		if(sheets.isEmpty()) {
-			throw new IllegalStateException("at least one sheet is required");
-		}
-		Workbook workbook = WorkbookFactory.create(streaming, rowAccessWindowSize);
-		try {
-			SheetRenderer renderer = new SheetRenderer(workbook);
-			for (SheetDefinition sheet : sheets) {
-				renderer.render(sheet);
-			}
-			try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-				workbook.write(out);
-				return out.toByteArray();
-			} catch (IOException e) {
-				throw new RuntimeException("Error write workbook", e);
-			}
-		} finally {
-			WorkbookFactory.close(workbook);
+		try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+			build(out);
+			return out.toByteArray();
+		} catch (IOException e) {
+			throw new IllegalStateException("Error write workbook", e);
 		}
 	}
 
 	@Override
 	public void build(OutputStream out) {
+		if(sheets.isEmpty()) {
+			throw new IllegalStateException("at least one sheet is required");
+		}
+		
+		var start = Instant.now();
+		logger.debug("start building workbook at {}", start);
+		
 		Workbook workbook = WorkbookFactory.create(streaming, rowAccessWindowSize);
 		try {
 			SheetRenderer renderer = new SheetRenderer(workbook);
@@ -79,8 +75,13 @@ public class ExcelBuilder implements WorkbookStep, BuildStep {
 				renderer.render(sheet);
 			}
 			workbook.write(out);
+			var finish = Instant.now();
+			logger.debug(
+				"finish building workbook at {} in {} seconds", 
+				finish, ((finish.toEpochMilli() - start.toEpochMilli())/1000.0)
+			);
 		} catch (IOException e) {
-			throw new RuntimeException("error write workbook", e);
+			throw new IllegalStateException("error write workbook", e);
 		} finally {
 			WorkbookFactory.close(workbook);
 		}

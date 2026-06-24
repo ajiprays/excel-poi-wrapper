@@ -11,14 +11,16 @@ import org.apache.poi.ss.util.CellUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.aji_prayitno.excel.exporter.core.render.BodyRenderer;
 import com.aji_prayitno.excel.exporter.core.render.CellWriter;
 import com.aji_prayitno.excel.exporter.core.render.RenderContext;
+import com.aji_prayitno.excel.exporter.model.SheetDefinition;
 import com.aji_prayitno.excel.exporter.model.border.ManualTableColumnDefinition;
 import com.aji_prayitno.excel.exporter.model.border.ManualTableDefinition;
 import com.aji_prayitno.excel.exporter.style.StyleKey.BorderStyleType;
 import com.aji_prayitno.excel.exporter.style.StyleRegistry;
 
-public final class ManualTableBodyRenderer {
+public final class ManualTableBodyRenderer implements BodyRenderer {
 	private final Logger logger = LoggerFactory.getLogger(ManualTableBodyRenderer.class);
 	private final StyleRegistry styles;
 	private final CellWriter cellWriter = new CellWriter();
@@ -27,7 +29,12 @@ public final class ManualTableBodyRenderer {
 		this.styles = styles;
 	}
 
-	public <T> int render(RenderContext context, ManualTableDefinition<T> tableDefinition, int lastRowIndex) {
+	@Override
+	public int render(RenderContext context, SheetDefinition sheetDefinition, int lastRowIndex) {
+		return render(context, sheetDefinition.getManualTable(), lastRowIndex);
+	}
+	
+	private <T> int render(RenderContext context, ManualTableDefinition<T> tableDefinition, int lastRowIndex) {
 		switch (tableDefinition.getDataType()) {
 		case LIST :
 			return renderFromList(context, tableDefinition, lastRowIndex);
@@ -40,7 +47,7 @@ public final class ManualTableBodyRenderer {
 		}
 	}
 
-	public <T> int renderFromList(RenderContext context, ManualTableDefinition<T> tableDefinition, int lastRowIndex) {
+	private <T> int renderFromList(RenderContext context, ManualTableDefinition<T> tableDefinition, int lastRowIndex) {
 		Sheet sheet = context.getSheet();
 		List<ManualTableColumnDefinition<T>> columns = tableDefinition.getColumns();
 		boolean isBordered = tableDefinition.isBordered();
@@ -72,7 +79,7 @@ public final class ManualTableBodyRenderer {
 		return lastRowIndex;
 	}
 	
-	public <T> int renderFromIterator(
+	private <T> int renderFromIterator(
 		RenderContext context, ManualTableDefinition<T> tableDefinition, 
 		int lastRowIndex, Iterator<T> data
 	) {
@@ -108,7 +115,7 @@ public final class ManualTableBodyRenderer {
 		return lastRowIndex;
 	}
 	
-	public <T> int renderFromStream(RenderContext context, ManualTableDefinition<T> tableDefinition, int lastRowIndex) {
+	private <T> int renderFromStream(RenderContext context, ManualTableDefinition<T> tableDefinition, int lastRowIndex) {
 		try(Stream<T> dataStream = tableDefinition.getDataStream()){
 			Iterator<T> data = dataStream.iterator();
 			return renderFromIterator(context, tableDefinition, lastRowIndex, data);

@@ -23,24 +23,6 @@ public class ManualTableDefinition<T> {
 	private Stream<T> dataStream;
 	private List<ManualTableSummaryDefinition> summaries = new ArrayList<>();
 	
-	public ManualTableDefinition() {}
-	public ManualTableDefinition(
-		TableStyle tableStyle, BorderStyle borderStyle,
-		List<ManualTableColumnDefinition<T>> columns, 
-		Class<T> dataClass, DataType dataType, List<T> data,
-		Iterator<T> dataIterator, Stream<T> dataStream, 
-		List<ManualTableSummaryDefinition> summaries
-	) {
-		this.tableStyle = tableStyle;
-		this.borderStyle = borderStyle;
-		this.columns = columns;
-		this.dataClass = dataClass;
-		this.dataType = dataType;
-		this.data = data;
-		this.dataIterator = dataIterator;
-		this.dataStream = dataStream;
-		this.summaries = summaries;
-	}
 	public TableStyle getTableStyle() {
 		return tableStyle;
 	}

@@ -29,7 +29,7 @@ public final class HeaderTreeBuilder {
 		int maxDepth = findMaxDepth(root);
 		calculateRowSpan(root, maxDepth);
 		assignStartColumn(root, 0);
-		logger.debug("header node {}", root.toString());
+		logger.debug("header node {}", root);
 		return root;
 	}
 

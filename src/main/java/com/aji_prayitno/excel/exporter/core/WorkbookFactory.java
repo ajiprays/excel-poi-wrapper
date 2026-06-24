@@ -30,8 +30,7 @@ public final class WorkbookFactory {
 		try {
 			workbook.close();
 		} catch (IOException e) {
-			logger.error("close() error: ", e.getCause());
-			throw new RuntimeException("error close workbook", e);
+			throw new IllegalStateException("close workbook I/O error", e);
 		}
 	}
 }

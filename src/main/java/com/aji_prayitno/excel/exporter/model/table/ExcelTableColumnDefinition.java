@@ -16,22 +16,6 @@ public final class ExcelTableColumnDefinition<T> {
 	private boolean bold;
 	private String customDataFormat;
 
-	public ExcelTableColumnDefinition() {}
-	public ExcelTableColumnDefinition(
-		String header, Function<T, ?> mapper, Integer width, boolean autoSize,
-		boolean shrinkToFit, boolean wrapText, HorizontalAlignment alignment, boolean bold,
-		String customDataFormat
-	) {
-		this.header = header;
-		this.mapper = mapper;
-		this.width = width;
-		this.autoSize = autoSize;
-		this.shrinkToFit = shrinkToFit;
-		this.wrapText = wrapText;
-		this.alignment = alignment;
-		this.bold = bold;
-		this.customDataFormat = customDataFormat;
-	}
 	public String getHeader() {
 		return header;
 	}

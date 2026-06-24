@@ -15,6 +15,9 @@ public final class SheetBuilder implements SheetStep {
 
 	@Override
     public TableStep fromSheet(String sheetName) {
+		if(sheetName == null) {
+			throw new IllegalArgumentException("sheetName cannot be null.");
+		}
     	return new TableBuilder(inputStream, sheetName);
     }
 

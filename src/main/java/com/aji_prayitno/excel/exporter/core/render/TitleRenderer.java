@@ -19,7 +19,7 @@ final class TitleRenderer {
 		this.styles = styles;
 	}
 
-	public <T> int render(RenderContext context, SheetDefinition sheetDefinition, int lastRowIndex) {
+	public int render(RenderContext context, SheetDefinition sheetDefinition, int lastRowIndex) {
 		logger.debug("render sheet:{} title", context.getSheet().getSheetName());
 		Sheet sheet = context.getSheet();
 		int totalColumn = 0;

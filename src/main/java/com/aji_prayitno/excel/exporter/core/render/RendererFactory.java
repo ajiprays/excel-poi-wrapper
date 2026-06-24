@@ -20,20 +20,20 @@ final class RendererFactory {
 	public TitleRenderer titleRenderer() {
 		return new TitleRenderer(styles);
 	}
-	public ManualTableHeaderRenderer manualTableHeaderRenderer() {
-		return new ManualTableHeaderRenderer(styles);
+	public HeaderRenderer headerRenderer(Boolean isManualTable) {
+		if(Boolean.TRUE.equals(isManualTable)) {
+			return new ManualTableHeaderRenderer(styles);
+		}
+		return new ExcelTableHeaderRenderer(styles);
 	}
-	public ManualTableBodyRenderer manualTableBodyRenderer() {
-		return new ManualTableBodyRenderer(styles);
+	public BodyRenderer bodyRenderer(Boolean isManualTable) {
+		if(Boolean.TRUE.equals(isManualTable)) {
+			return new ManualTableBodyRenderer(styles);
+		}
+		return new ExcelTableBodyRenderer(styles);
 	}
 	public ManualTableSummaryRenderer summaryRenderer() {
 		return new ManualTableSummaryRenderer(styles);
-	}
-	public ExcelTableHeaderRenderer excelTableHeaderRenderer() {
-		return new ExcelTableHeaderRenderer(styles);
-	}
-	public ExcelTableBodyRenderer excelTableBodyRenderer() {
-		return new ExcelTableBodyRenderer(styles);
 	}
 	public ExcelTableRenderer excelTableRenderer() {
 		return new ExcelTableRenderer();

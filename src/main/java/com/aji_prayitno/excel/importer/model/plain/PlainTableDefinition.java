@@ -1,10 +1,10 @@
-package com.aji_prayitno.excel.importer.model.xls;
+package com.aji_prayitno.excel.importer.model.plain;
 
 import java.util.List;
 
 import com.aji_prayitno.excel.importer.model.ColumnDefinition;
 
-public final class XlsTableDefinition<T> {
+public final class PlainTableDefinition<T> {
 	private int startRowIndex;
     private Class<T> dtoClass;
     private List<ColumnDefinition<T, ?>> columns;
